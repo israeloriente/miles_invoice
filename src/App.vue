@@ -1,31 +1,13 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.svg">
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <h1>{{ msg }}</h1>
+    <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </nav>
+    <router-view/>
+    <h1>Hello Vue</h1>
   </div>
 </template>
-
-<script>
-
-
-export default {
-  name: 'App',
-  data() {
-    return {
-      data: 4,
-      msg: 'Hello World'
-    }
-  },
-  components: {},
-  methods: {
-
-  },
-  onMounted() {
-    console.log('mounted')
-  }
-}
-</script>
 
 <style lang="scss">
 #app {
@@ -34,9 +16,18 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
-  img {
-    width: 60px;
+}
+
+nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
   }
 }
 </style>
