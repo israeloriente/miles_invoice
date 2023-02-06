@@ -5,8 +5,8 @@
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4>
             <v-card class="elevation-12">
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>Login form</v-toolbar-title>
+              <v-toolbar color="primary">
+                <v-toolbar-title class="title">Auth</v-toolbar-title>
               </v-toolbar>
               <v-card-text>
                 <v-form>
@@ -49,18 +49,26 @@ export default {
     this.msg; // type: string
     this.count; // type: number
   },
+  computed: {},
 };
 </script>
 
 
 
 <style lang="scss">
-#inspire {
-  background: center center / cover no-repeat;
-  background-image: linear-gradient(
-      rgba(255, 255, 255, 0.5),
-      rgba(255, 255, 255, 0.7)
-    ),
-    url("https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg");
+.v-toolbar {
+  color: var(--v-primary-base);
+  background-color: var(--v-primary-base);
 }
+.title {
+  color: var(--v-primary-base-contrast);
+}
+// #inspire {
+//   background: center center / cover no-repeat;
+//   background-image: linear-gradient(
+//       rgba(255, 255, 255, 0.5),
+//       rgba(255, 255, 255, 0.7)
+//     ),
+//     url("https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg");
+// }
 </style>
