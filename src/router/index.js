@@ -9,6 +9,10 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
+    redirect: '/home',
+  },
+  {
+    path: '/home',
     name: 'home',
     component: HomeView
   },
@@ -26,11 +30,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
-router.beforeEach((to, from, next) => auth_guard(to, from, next))
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
 })
+router.beforeEach((to, from, next) => auth_guard(to, from, next))
 
 export default router

@@ -4,7 +4,7 @@
 export const auth_guard = async (to, from, next) => {
   console.log(to);
   console.log(from);
-  console.log(next);
+  // console.log(next);
   // const auth_store = use_auth_store()
   // const user_store = use_user_store()
 
@@ -12,7 +12,7 @@ export const auth_guard = async (to, from, next) => {
 
   // && !user_store.user?.id
   const is_authenticated = true;
-  if (!public_routes.includes(to.name.toLowerCase()) && !is_authenticated) {
+  if (!public_routes.includes(to?.name?.toLowerCase()) && !is_authenticated) {
     // auth_store.clear_auth();
     next("/login");
     return;
