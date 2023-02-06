@@ -1,67 +1,45 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col class="mt-2" cols="12">
-        <strong>Users</strong>
-      </v-col>
-
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-      <v-col cols="6" md="2">
-        <v-sheet height="150"></v-sheet>
-      </v-col>
-    </v-row>
-  </v-container>
-  <!-- <h1>Add new Invoice</h1>
-      <h3>See invoices list</h3>
-      <v-btn elevation="2">Abrir</v-btn> -->
+  <v-main>
+    <v-container>
+      <v-container class="box">
+        <img src="@/assets/miles.png" />
+      </v-container>
+      <v-layout column align-center justify-center>
+        <transition name="fade">
+          <v-btn elevation="0" v-if="show">See Invoices</v-btn>
+        </transition>
+        <transition name="fade">
+          <v-btn class="mt-3" elevation="0" v-if="show">Add New Invoice</v-btn>
+        </transition>
+      </v-layout>
+    </v-container>
+  </v-main>
 </template>
 
 <script lang="ts">
+import anime from "animejs";
+
 export default {
   name: "HomeView",
   data() {
     return {
-      drawer: null,
-      users: 10,
+      show: false,
     };
   },
-  components: {},
+  mounted() {
+    setTimeout(() => {
+      anime({
+        targets: ".box",
+        translateY: -30,
+        duration: 2000,
+      });
+      this.show = true;
+    }, 1000);
+  },
 };
 </script>
 
 <style lang="scss">
-.content {
-  color: var(--v-primary-base-contrast);
-}
 </style>
 
 
