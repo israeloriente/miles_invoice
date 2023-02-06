@@ -1,19 +1,24 @@
 <template>
   <div id="app">
-    <v-main>
-      <BaseToolbar />
+    <v-app>
+      <BaseToolbar v-if="toolbar" />
       <router-view />
-    </v-main>
+    </v-app>
   </div>
 </template>
 
 <script lang="ts">
 import BaseToolbar from "@/components/base/BaseToolbar.vue";
+import { useStore } from "@/store/main";
 
 export default {
   name: "App",
-  data() {
-    return {};
+  created() {},
+  setup() {
+    const { toolbar } = useStore();
+    return {
+      toolbar,
+    };
   },
   components: {
     BaseToolbar,
@@ -22,5 +27,4 @@ export default {
 </script>
 
 <style lang="scss">
-
 </style>

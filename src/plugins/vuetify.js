@@ -11,11 +11,11 @@ const colors = {
   primary_shade: "#008f88",
   primary_tint: "#1aaba4",
   secondary: "#ffffff",
-  accent: "#",
-  error: "#",
-  info: "#",
-  success: "#",
-  warning: "#",
+  // accent: "#",
+  // error: "#",
+  // info: "#",
+  // success: "#",
+  // warning: "#",
 };
 
 export default new Vuetify({
