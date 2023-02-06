@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/auth/LoginPage.vue'
+import auth_guard from "@/router/guards/auth"
 
 Vue.use(VueRouter)
 
@@ -25,7 +26,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
-
+router.beforeEach((to, from, next) => auth_guard(to, from, next))
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
