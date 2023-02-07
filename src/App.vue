@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <BaseToolbar v-if="toolbar" />
+      <BaseToolbar  />
       <router-view />
     </v-app>
   </div>
@@ -9,13 +9,13 @@
 
 <script lang="ts">
 import BaseToolbar from "@/components/base/BaseToolbar.vue";
-import { useStore } from "@/store/main";
+// import { useStore } from "@/store/main";
 
 export default {
   name: "App",
   created() {},
   setup() {
-    const { toolbar } = useStore();
+    // const { toolbar } = useStore();
     return {
       toolbar,
     };
