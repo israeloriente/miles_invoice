@@ -1,3 +1,4 @@
+import CollaboratorViewVue from "@/views/CollaboratorView.vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import WorkspaceView from "../views/WorkspaceView.vue";
@@ -10,9 +11,14 @@ const routes = [
     redirect: "/workspace",
   },
   {
-    path: "/workspace/",
+    path: "/workspace",
     name: "workspace",
     component: WorkspaceView,
+  },
+  {
+    path: "/collaborator",
+    name: "collaborator",
+    component: CollaboratorViewVue,
   },
 ];
 const router = new VueRouter({

@@ -4,13 +4,13 @@
       <v-data-table
         height="500"
         :headers="headers"
-        :items="collaborators"
-        sort-by="calories"
+        :items="workspaces"
+        sort-by="name"
         class="elevation-0"
       >
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>workspaces</v-toolbar-title>
+            <v-toolbar-title>Workspaces</v-toolbar-title>
             <v-spacer></v-spacer>
 
             <v-dialog v-model="dialog" max-width="500px">
@@ -34,17 +34,12 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12" sm="6" md="6">
+                      <v-col cols="12" sm="12" md="12">
                         <v-text-field
                           label="Name"
+                          ref="nameRef"
                           v-model="currentItem.name"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          label="Email"
-                          required
-                          v-model="currentItem.email"
+                          v-on:keyup.enter="save()"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -88,136 +83,110 @@
           </v-icon>
           <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
         </template>
-        <!-- <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize"> Reset </v-btn>
-        </template> -->
       </v-data-table>
     </v-container>
   </v-main>
 </template>
 
 <script>
-// import BaseAddWorkspace from "@/components/base/BaseAddWorkspace.vue";
-// import BaseConfirmAlert from "@/components/base/BaseConfirmAlert.vue";
-
+import { ref } from "vue";
 export default {
-  components: {
-    // BaseConfirmAlert,
+  setup() {
+    const nameRef = ref("");
+    return {
+      nameRef,
+    };
   },
   data: () => ({
-    cola: {
-      name: "",
-      email: "",
-    },
-
     dialog: false,
     dialogDelete: false,
     headers: [
-      {
-        text: "Name",
-        value: "name",
-      },
-      {
-        text: "Email",
-        value: "email",
-      },
+      { text: "Name", value: "name" },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    collaborators: [],
+    workspaces: [],
     /**
      * @type {number}
-     * @description Determine the index of the item to be edited,
+     * Determine the index of the item to be edited,
      * -1 means that we want to add a new item
      */
-    currentIndexItem: -1,
+    currentIndex: -1,
     currentItem: {
       name: "",
-      email: "",
+      colaborators: [],
     },
     defaultItem: {
       name: "",
-      email: "",
+      colaborators: [],
     },
   }),
-
   watch: {
     dialog(val) {
       val || this.close();
+      if (val)
+        setTimeout(() => {
+          this.$refs.nameRef.focus();
+        }, 100);
     },
     dialogDelete(val) {
       val || this.closeDelete();
     },
   },
-
   created() {
-    this.collaborators = JSON.parse(localStorage.getItem("workspaces")) || [];
+    this.workspaces = JSON.parse(localStorage.getItem("workspaces")) || [];
   },
-
   methods: {
     editItem(item) {
-      this.currentIndexItem = this.collaborators.indexOf(item);
+      this.currentIndex = this.workspaces.indexOf(item);
       this.currentItem = Object.assign({}, item);
       this.dialog = true;
     },
-
     deleteItem(item) {
-      this.currentIndexItem = this.collaborators.indexOf(item);
+      this.currentIndex = this.workspaces.indexOf(item);
       this.currentItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
-
     deleteItemConfirm() {
-      this.collaborators.splice(this.currentIndexItem, 1);
-      localStorage.setItem("workspaces", JSON.stringify(this.collaborators));
+      this.workspaces.splice(this.currentIndex, 1);
+      localStorage.setItem("workspaces", JSON.stringify(this.workspaces));
       this.closeDelete();
     },
-
     close() {
       this.dialog = false;
       this.$nextTick(() => {
         this.currentItem = Object.assign({}, this.defaultItem);
-        this.currentIndexItem = -1;
+        this.currentIndex = -1;
       });
     },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.currentItem = Object.assign({}, this.defaultItem);
-        this.currentIndexItem = -1;
+        this.currentIndex = -1;
       });
     },
-
+    /** Save or Edit the current item */
     save() {
-      if (this.currentItem.name && this.currentItem.email) {
-        if (this.currentIndexItem == -1) {
-          this.collaborators.push(this.currentItem);
-          let newList = JSON.stringify(this.collaborators);
+      if (this.currentItem.name) {
+        if (this.currentIndex == -1) {
+          this.workspaces.push(this.currentItem);
+          let newList = JSON.stringify(this.workspaces);
           localStorage.setItem("workspaces", newList);
         } else {
-          Object.assign(
-            this.collaborators[this.currentIndexItem],
-            this.currentItem
-          );
-          let newList = JSON.stringify(this.collaborators);
+          Object.assign(this.workspaces[this.currentIndex], this.currentItem);
+          let newList = JSON.stringify(this.workspaces);
           localStorage.setItem("workspaces", newList);
         }
-        this.resetCola();
+        this.resetCurrentItem();
         this.close();
-      } else alert("Campos name e email são obrigatórios");
+      } else alert("Campos name é obrigatórios");
     },
-    resetCola() {
-      this.cola = {
-        name: "",
-        email: "",
-      };
+    resetCurrentItem() {
+      this.currentItem = Object.assign({}, this.defaultItem);
     },
   },
 };
 </script>
-
-<style lang="scss">
-</style>
 
 
 
