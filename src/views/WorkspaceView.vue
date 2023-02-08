@@ -113,11 +113,9 @@ export default {
     currentIndex: -1,
     currentItem: {
       name: "",
-      colaborators: [],
     },
     defaultItem: {
       name: "",
-      colaborators: [],
     },
   }),
   watch: {
@@ -169,7 +167,9 @@ export default {
     save() {
       if (this.currentItem.name) {
         if (this.currentIndex == -1) {
-          this.workspaces.push(this.currentItem);
+          let indexOf = this.workspaces.length;
+          let with_uid = Object.assign({ uid: indexOf }, this.currentItem);
+          this.workspaces.push(with_uid);
           let newList = JSON.stringify(this.workspaces);
           localStorage.setItem("workspaces", newList);
         } else {

@@ -32,7 +32,7 @@ export default {
       selectedItem: 0,
       items: [
         { text: "Workspaces", icon: "mdi-domain", route: "/workspace" },
-        { text: "Collaborators", icon: "mdi-account", route: "/collaborators" },
+        { text: "Collaborators", icon: "mdi-account", route: "/collaborator" },
       ],
     };
   },
