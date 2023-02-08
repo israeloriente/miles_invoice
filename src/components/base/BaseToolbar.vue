@@ -2,11 +2,23 @@
   <v-main>
     <v-app-bar elevation="0" elevate-on-scroll>
       <v-app-bar-nav-icon @click="sideMenu = !sideMenu"></v-app-bar-nav-icon>
-      <v-toolbar-title class="hello">Hello</v-toolbar-title>
+      <v-toolbar-title>Home</v-toolbar-title>
     </v-app-bar>
 
     <v-navigation-drawer v-model="sideMenu" fixed temporary>
-      <p>Side-menu</p>
+      <v-list dense>
+        <v-subheader style="font-size: 24px">💩</v-subheader>
+        <v-list-item-group v-model="selectedItem" color="primary">
+          <v-list-item v-for="(item, i) in items" :key="i" :to="item.route">
+            <v-list-item-icon>
+              <v-icon v-text="item.icon"></v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.text"></v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
     </v-navigation-drawer>
   </v-main>
 </template>

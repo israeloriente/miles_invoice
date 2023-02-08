@@ -1,18 +1,18 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import WorkspaceView from "../views/WorkspaceView.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    redirect: "/home",
+    redirect: "/workspace",
   },
   {
-    path: "/home",
-    name: "home",
-    component: HomeView,
+    path: "/workspace/",
+    name: "workspace",
+    component: WorkspaceView,
   },
 ];
 const router = new VueRouter({
