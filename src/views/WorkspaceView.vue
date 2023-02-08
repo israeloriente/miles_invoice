@@ -19,6 +19,7 @@
                   dark
                   color="primary"
                   class="mb-2"
+                  data-cy="add_workspace"
                   v-bind="attrs"
                   v-on="on"
                 >
@@ -38,6 +39,7 @@
                         <v-text-field
                           label="Name"
                           ref="nameRef"
+                          data-cy="save_workspace_name"
                           v-model="currentItem.name"
                           v-on:keyup.enter="save()"
                         ></v-text-field>
