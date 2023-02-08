@@ -5,7 +5,11 @@
   --v-primary-base-tint: #1aaba4;
 }
 html {
-  // background-color: rgba(var(--v-primary-base-rgb), 0.8);
+  .prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+  }
   img {
     pointer-events: none;
     user-select: none;

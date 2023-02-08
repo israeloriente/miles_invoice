@@ -7,7 +7,7 @@
 
     <v-navigation-drawer v-model="sideMenu" fixed temporary>
       <v-list dense>
-        <v-subheader style="font-size: 24px">💩</v-subheader>
+        <v-subheader class="prevent-select">💩</v-subheader>
         <v-list-item-group v-model="selectedItem" color="primary">
           <v-list-item v-for="(item, i) in items" :key="i" :to="item.route">
             <v-list-item-icon>
@@ -40,4 +40,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.v-subheader {
+  font-size: 24px;
+}
 </style>
