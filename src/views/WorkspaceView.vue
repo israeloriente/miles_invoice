@@ -12,7 +12,6 @@
           <v-toolbar flat>
             <v-toolbar-title>Workspaces</v-toolbar-title>
             <v-spacer></v-spacer>
-
             <v-dialog v-model="dialog" max-width="500px">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -57,25 +56,6 @@
               </v-card>
             </v-dialog>
             <!-- FIM ADD Workspace -->
-
-            <!-- CONFIRM ALERT -->
-            <v-dialog max-width="290" v-model="dialogDelete">
-              <v-card>
-                <v-card-title class="text"
-                  >Do you really want to remove this item?
-                </v-card-title>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" text @click="closeDelete">
-                    Cancel
-                  </v-btn>
-                  <v-btn color="red" text @click="deleteItemConfirm">
-                    Confirm
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <!-- FIM CONFIRM ALERT -->
           </v-toolbar>
         </template>
         <!-- EDIT -->
@@ -83,7 +63,9 @@
           <v-icon small class="mr-2" @click="editItem(item)">
             mdi-pencil
           </v-icon>
-          <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          <v-icon small @click="deleteItem(item)" id="mdi_delete">
+            mdi-delete
+          </v-icon>
         </template>
       </v-data-table>
     </v-container>
@@ -92,7 +74,11 @@
 
 <script>
 import { ref } from "vue";
+import modal_mixin from "@/mixins/modal";
+
 export default {
+  components: {},
+  mixins: [modal_mixin],
   setup() {
     const nameRef = ref("");
     return {
@@ -101,7 +87,6 @@ export default {
   },
   data: () => ({
     dialog: false,
-    dialogDelete: false,
     headers: [
       { text: "Name", value: "name" },
       { text: "Actions", value: "actions", sortable: false },
@@ -125,11 +110,8 @@ export default {
       val || this.close();
       if (val)
         setTimeout(() => {
-          this.$refs.nameRef.focus();
+          this.$refs.nameRef?.focus();
         }, 100);
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
     },
   },
   created() {
@@ -142,24 +124,18 @@ export default {
       this.dialog = true;
     },
     deleteItem(item) {
-      this.currentIndex = this.workspaces.indexOf(item);
-      this.currentItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      this.workspaces.splice(this.currentIndex, 1);
-      localStorage.setItem("workspaces", JSON.stringify(this.workspaces));
-      this.closeDelete();
+      this.confirmAlert().then((res) => {
+        document.getElementById("mdi_delete").focus();
+        if (!res) return;
+        this.currentIndex = this.workspaces.indexOf(item);
+        this.currentItem = Object.assign({}, item);
+        this.workspaces.splice(this.currentIndex, 1);
+        localStorage.setItem("workspaces", JSON.stringify(this.workspaces));
+        this.close();
+      });
     },
     close() {
       this.dialog = false;
-      this.$nextTick(() => {
-        this.currentItem = Object.assign({}, this.defaultItem);
-        this.currentIndex = -1;
-      });
-    },
-    closeDelete() {
-      this.dialogDelete = false;
       this.$nextTick(() => {
         this.currentItem = Object.assign({}, this.defaultItem);
         this.currentIndex = -1;
@@ -181,7 +157,7 @@ export default {
         }
         this.resetCurrentItem();
         this.close();
-      } else alert("Campos name é obrigatórios");
+      } else alert("Name Required");
     },
     resetCurrentItem() {
       this.currentItem = Object.assign({}, this.defaultItem);

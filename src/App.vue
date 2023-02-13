@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <BaseConfirmAlert />
     <v-app>
       <BaseToolbar />
       <router-view />
@@ -8,8 +9,6 @@
 </template>
 
 <script lang="ts">
-import BaseToolbar from "@/components/base/BaseToolbar.vue";
-
 export default {
   name: "App",
   created() {},
@@ -17,7 +16,8 @@ export default {
     return {};
   },
   components: {
-    BaseToolbar,
+    BaseToolbar: () => import("@/components/BaseToolbar.vue"),
+    BaseConfirmAlert: () => import("@/components/BaseConfirmAlert.vue"),
   },
 };
 </script>

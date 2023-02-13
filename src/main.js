@@ -7,6 +7,9 @@ import "./theme/animations.scss";
 
 Vue.config.productionTip = false;
 
+// Event BUS
+export const eventBus = new Vue();
+
 new Vue({
   vuetify,
   router,

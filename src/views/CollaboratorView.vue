@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import BaseSelectWorkspace from "@/components/base/BaseSelectWorkspace.vue";
+import BaseSelectWorkspace from "@/components/BaseSelectWorkspace.vue";
 
 export default {
   components: {
