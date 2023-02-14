@@ -58,6 +58,9 @@
             <!-- FIM ADD Workspace -->
           </v-toolbar>
         </template>
+        <template v-slot:[`item.name`]="{ item }">
+          <span>{{ item.get("name") }}</span>
+        </template>
         <!-- EDIT -->
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
@@ -74,7 +77,10 @@
 
 <script>
 import { ref } from "vue";
+import { Workspace } from "@/api/Workspace.service";
+import Parse from "parse";
 import modal_mixin from "@/mixins/modal";
+import $message from "popular-message";
 
 export default {
   components: {},
@@ -115,12 +121,14 @@ export default {
     },
   },
   created() {
-    this.workspaces = JSON.parse(localStorage.getItem("workspaces")) || [];
+    new Workspace().getObjects().then((res) => {
+      this.workspaces = res || [];
+    });
   },
   methods: {
     editItem(item) {
       this.currentIndex = this.workspaces.indexOf(item);
-      this.currentItem = Object.assign({}, item);
+      this.currentItem = { name: item.get("name") };
       this.dialog = true;
     },
     deleteItem(item) {
@@ -128,10 +136,12 @@ export default {
         document.getElementById("mdi_delete").focus();
         if (!res) return;
         this.currentIndex = this.workspaces.indexOf(item);
-        this.currentItem = Object.assign({}, item);
-        this.workspaces.splice(this.currentIndex, 1);
-        localStorage.setItem("workspaces", JSON.stringify(this.workspaces));
-        this.close();
+        this.currentItem = { name: item.get("name") };
+        this.workspaces[this.currentIndex].destroy().then((res) => {
+          this.showToast(`${res.get("name")} deleted`);
+          this.workspaces.splice(this.currentIndex, 1);
+          this.close();
+        });
       });
     },
     close() {
@@ -145,19 +155,28 @@ export default {
     save() {
       if (this.currentItem.name) {
         if (this.currentIndex == -1) {
-          let indexOf = this.workspaces.length;
-          let with_uid = Object.assign({ uid: indexOf }, this.currentItem);
-          this.workspaces.push(with_uid);
-          let newList = JSON.stringify(this.workspaces);
-          localStorage.setItem("workspaces", newList);
+          const myNewObject = new Parse.Object("Workspace");
+          myNewObject.set("name", this.currentItem.name);
+          myNewObject.save().then((res) => {
+            this.workspaces.push(res);
+            this.showToast("Workspace Created");
+          });
         } else {
-          Object.assign(this.workspaces[this.currentIndex], this.currentItem);
-          let newList = JSON.stringify(this.workspaces);
-          localStorage.setItem("workspaces", newList);
+          this.workspaces[this.currentIndex].set("name", this.currentItem.name);
+          this.workspaces[this.currentIndex]
+            .save()
+            .then(() => this.showToast("Workspace Updated"));
         }
         this.resetCurrentItem();
         this.close();
       } else alert("Name Required");
+    },
+    showToast(message) {
+      $message.info(message, {
+        duration: 3,
+        closable: true,
+        dangerUseHtml: false,
+      });
     },
     resetCurrentItem() {
       this.currentItem = Object.assign({}, this.defaultItem);
