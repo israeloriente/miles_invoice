@@ -74,10 +74,7 @@
                       </v-col>
                     </v-row>
                     <v-row>
-                      <BaseSelectWorkspace
-                        :resultFromParent="currentItem.workspaces"
-                        @BaseSelectWorkspaceUpdated="updateWorkspace"
-                      />
+                      <BaseSelectWorkspace :currentItem="currentItem" />
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -91,35 +88,30 @@
               </v-card>
             </v-dialog>
             <!-- FIM ADD Colaborator -->
-
-            <!-- CONFIRM ALERT -->
-            <v-dialog max-width="290" v-model="dialogDelete">
-              <v-card>
-                <v-card-title class="text"
-                  >Do you really want to remove this item?
-                </v-card-title>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" text @click="closeDelete">
-                    Cancel
-                  </v-btn>
-                  <v-btn color="red" text @click="deleteItemConfirm">
-                    Confirm
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <!-- FIM CONFIRM ALERT -->
           </v-toolbar>
+        </template>
+        <!-- Full Name -->
+        <template v-slot:[`item.full_name`]="{ item }">
+          <span v-if="item.attributes.fullName">{{
+            item.get("fullName")
+          }}</span>
+          <span v-else class="danger">No data</span>
+        </template>
+        <!-- Age -->
+        <template v-slot:[`item.age`]="{ item }">
+          <span v-if="item.attributes.age">{{ item.get("age") }}</span>
+          <span v-else class="danger">No data</span>
         </template>
         <!-- Salary -->
         <template v-slot:[`item.salary`]="{ item }">
-          <span v-if="item.salary">{{ item.salary }}</span>
+          <span v-if="item.attributes.salary">{{ item.get("salary") }}</span>
           <span v-else class="danger">No data</span>
         </template>
         <!-- Area Work -->
         <template v-slot:[`item.area_work`]="{ item }">
-          <span v-if="item.area_work">{{ item.area_work }}</span>
+          <span v-if="item.attributes.areaWork">{{
+            item.get("areaWork")
+          }}</span>
           <span v-else class="danger">No data</span>
         </template>
         <!-- Workspaces -->
@@ -128,9 +120,9 @@
             color="primary"
             class="elevation-0"
             small
-            :disabled="!item.workspaces.length"
+            :disabled="!item.get(`workspaces_index`)"
             @click="editItem(item)"
-            >{{ item.workspaces.length }}</v-btn
+            >{{ item.get("workspaces_index") || 0 }}</v-btn
           >
         </template>
         <!-- EDIT -->
@@ -138,7 +130,9 @@
           <v-icon small class="mr-2" @click="editItem(item)">
             mdi-pencil
           </v-icon>
-          <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          <v-icon small @click="deleteItem(item)" id="mdi_delete">
+            mdi-delete
+          </v-icon>
         </template>
       </v-data-table>
     </v-container>
@@ -147,14 +141,18 @@
 
 <script>
 import BaseSelectWorkspace from "@/components/BaseSelectWorkspace.vue";
+import modal_mixin from "@/mixins/modal";
+import { Collaborator } from "@/api/Collaborator.service";
+import $message from "popular-message";
 
 export default {
   components: {
     BaseSelectWorkspace,
   },
+  mixins: [modal_mixin],
   data: () => ({
     dialog: false,
-    dialogDelete: false,
+    // dialogDelete: false,
     headers: [
       { text: "Full Name", value: "full_name", sortable: true },
       { text: "Age", value: "age" },
@@ -169,20 +167,22 @@ export default {
      * @description Determine the index of the item to be edited,
      * -1 means that we want to add a new item
      */
-    currentIndexItem: -1,
+    currentItemId: -1,
     currentItem: {
       full_name: "",
       age: 23,
       salary: 2300,
       area_work: "",
-      workspaces: [],
+      workspacesList: [],
+      defaultItem: undefined,
     },
     defaultItem: {
       full_name: "",
       age: 23,
       salary: 2300,
       area_work: "",
-      workspaces: [],
+      workspacesList: [],
+      defaultItem: undefined,
     },
   }),
 
@@ -200,28 +200,59 @@ export default {
   },
 
   created() {
-    let local = localStorage.getItem("collaborators");
-    this.collaborators = JSON.parse(local) || [];
+    new Collaborator().getObjects().then((res) => {
+      this.collaborators = res || [];
+      for (let i = 0; i < res.length; i++) {
+        let query = res[i].get("workspace").query();
+        query.find().then((rela) => {
+          this.collaborators[i].set("workspaces", rela);
+          this.collaborators[i].set("workspaces_index", rela.length || 0);
+        });
+      }
+    });
   },
 
   methods: {
-    updateWorkspace(data) {
-      this.currentItem.workspaces = data;
-    },
+    // updateWorkspace(data) {
+    //   console.log(data);
+
+    // },
     editItem(item) {
-      this.currentIndexItem = this.collaborators.indexOf(item);
-      this.currentItem = Object.assign({}, item);
+      let cola = new Collaborator();
+      console.log(item);
+      this.currentItemId = item.id;
+      cola.getObjectById(item.id).then(async (res) => {
+        let relations = (await cola.getWorkspacesList(res)) || [];
+        console.log(relations);
+        this.setCurrentItem(res, relations);
+        // console.log(obj);
+        // this.currentItem.workspaces = res.get("workspace") || [];
+        // this.currentItem.workspaces_index = res.get("workspace").length || 0;
+        // console.log(this.currentItem);
+        console.log(res);
+      });
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.currentIndexItem = this.collaborators.indexOf(item);
+      this.currentItemId = this.collaborators.indexOf(item);
       this.currentItem = Object.assign({}, item);
-      this.dialogDelete = true;
+      // this.dialogDelete = true;
+      this.confirmAlert().then((res) => {
+        document.getElementById("mdi_delete").focus();
+        if (!res) return;
+        this.currentIndex = this.collaborators.indexOf(item);
+        // this.setCurrentItem(item);
+        this.collaborators[this.currentIndex].destroy().then(() => {
+          this.showToast(`Item deleted`);
+          this.collaborators.splice(this.currentIndex, 1);
+          this.close();
+        });
+      });
     },
 
     deleteItemConfirm() {
-      this.collaborators.splice(this.currentIndexItem, 1);
+      // this.collaborators.splice(this.currentItemId, 1);
       localStorage.setItem("collaborators", JSON.stringify(this.collaborators));
       this.closeDelete();
     },
@@ -230,38 +261,61 @@ export default {
       this.dialog = false;
       this.$nextTick(() => {
         this.currentItem = Object.assign({}, this.defaultItem);
-        this.currentIndexItem = -1;
+        this.currentItemId = -1;
       });
     },
 
     closeDelete() {
-      this.dialogDelete = false;
+      // this.dialogDelete = false;
       this.$nextTick(() => {
         this.currentItem = Object.assign({}, this.defaultItem);
-        this.currentIndexItem = -1;
+        this.currentItemId = -1;
       });
     },
 
     save() {
-      if (this.currentItem.full_name && this.currentItem.age) {
-        if (this.currentIndexItem == -1) {
-          this.collaborators.push(this.currentItem);
-          let newList = JSON.stringify(this.collaborators);
-          localStorage.setItem("collaborators", newList);
+      if (this.currentItem.full_name) {
+        if (this.currentItemId == -1) {
+          new Collaborator().saveObject(this.currentItem).then((newObj) => {
+            this.collaborators.push(newObj);
+            this.showToast(`Item added`);
+          });
         } else {
-          Object.assign(
-            this.collaborators[this.currentIndexItem],
-            this.currentItem
-          );
-          let newList = JSON.stringify(this.collaborators);
-          localStorage.setItem("collaborators", newList);
+          new Collaborator().updateObject(this.currentItem.defaultItem).then((newObj) => {
+            this.collaborators[this.currentItemId] = newObj;
+            this.showToast(`Item updated`);
+          });
+          // Object.assign(
+          //   this.collaborators[this.currentItemId],
+          //   this.currentItem
+          // );
+          // let newList = JSON.stringify(this.collaborators);
+          // localStorage.setItem("collaborators", newList);
         }
         this.resetCola();
         this.close();
-      } else alert("Name and age is Required!");
+      } else alert("Name is Required!");
     },
     resetCola() {
       this.currentItem = this.defaultItem;
+    },
+    setCurrentItem(item, workspaces) {
+      this.currentItem = {
+        full_name: item.get("fullName"),
+        age: item.get("age"),
+        salary: item.get("salary"),
+        area_work: item.get("areaWork"),
+        workspacesList: workspaces,
+        defaultItem: item,
+      };
+      console.log(this.currentItem);
+    },
+    showToast(message) {
+      $message.info(message, {
+        duration: 3,
+        closable: true,
+        dangerUseHtml: false,
+      });
     },
   },
 };

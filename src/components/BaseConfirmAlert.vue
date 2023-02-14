@@ -62,7 +62,6 @@ export default {
       }
     },
     keypress(ev) {
-      console.log("ev");
       if (this.last?.key == "Meta" && ev.key == "Enter") this.close_modal(true);
       if (ev.key == "Escape") this.close_modal(undefined);
       this.last = { key: ev.key };
